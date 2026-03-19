@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Шеф дома</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #faf7f2;
+  --surface: #ffffff;
+  --warm: #f0ebe0;
+  --border: #e8e0d0;
+  --text: #1a1612;
+  --muted: #8a7f6e;
+  --accent: #c8622a;
+  --accent2: #2a6b4a;
+  --tag-bg: #f5efe4;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Jost', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #e8e0d0;
+}
+
+.phone {
+  width: 100%;
+  max-width: 420px;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+}
+
+.header {
+  padding: 52px 24px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 140px; height: 140px;
+  background: radial-gradient(circle, #f5e6d3 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.header-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.header-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.header-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: 300;
+}
+
+.api-section {
+  padding: 16px 24px;
+  background: #fff8f0;
+  border-bottom: 1px solid var(--border);
+}
+
+.api-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.api-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.api-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  background: white;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.api-input:focus { border-color: var(--accent); }
+
+.api-save-btn {
+  padding: 10px 16px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.api-save-btn:active { opacity: 0.8; }
+
+.api-status {
+  font-size: 11px;
+  margin-top: 6px;
+  color: var(--accent2);
+  min-height: 16px;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.section-title {
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.ingredients-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ingredients-box:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(200,98,42,0.08);
+}
+
+.ingredients-textarea {
+  width: 100%;
+  min-height: 100px;
+  border: none;
+  outline: none;
+  font-family: 'Jost', sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--text);
+  background: transparent;
+  resize: none;
+  line-height: 1.6;
+}
+
+.ingredients-textarea::placeholder { color: #c0b8a8; }
+
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.tag {
+  padding: 6px 12px;
+  background: var(--tag-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.tag.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.options-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.option-chip {
+  flex: 1;
+  padding: 10px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.option-chip.selected {
+  background: var(--warm);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.search-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--text);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+  margin-bottom: 28px;
+}
+
+.search-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loading {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+  gap: 16px;
+}
+
+.loading.show { display: flex; }
+
+.loader {
+  width: 40px; height: 40px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.results { display: none; }
+.results.show { display: block; }
+
+.results-header {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.recipe-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  animation: cardIn 0.4s ease both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.recipe-header {
+  padding: 18px 20px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.recipe-emoji {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.recipe-info { flex: 1; }
+
+.recipe-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.recipe-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.expand-icon {
+  color: var(--muted);
+  font-size: 18px;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.recipe-card.open .expand-icon { transform: rotate(180deg); }
+
+.recipe-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.recipe-card.open .recipe-body { max-height: 1000px; }
+
+.recipe-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 20px;
+}
+
+.recipe-content {
+  padding: 16px 20px 20px;
+}
+
+.recipe-section-title {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.ingredients-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.ingredient-tag {
+  padding: 4px 10px;
+  background: var(--tag-bg);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.ingredient-tag.missing {
+  background: #fef0ea;
+  color: var(--accent);
+}
+
+.steps-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.step-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.step-num {
+  width: 22px; height: 22px;
+  background: var(--text);
+  color: white;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.step-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #3a3530;
+  font-weight: 300;
+}
+
+.error-box {
+  background: #fff0eb;
+  border: 1px solid #f5c4aa;
+  border-radius: 16px;
+  padding: 16px 20px;
+  color: var(--accent);
+  font-size: 14px;
+  display: none;
+  margin-bottom: 16px;
+}
+
+.error-box.show { display: block; }
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-text { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-style: italic; }
+.empty-sub { font-size: 13px; margin-top: 6px; font-weight: 300; }
+
+@media (min-width: 421px) {
+  .phone {
+    border-radius: 40px;
+    min-height: 800px;
+    max-height: 900px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="header">
+    <div class="header-label">ИИ-помощник</div>
+    <div class="header-title">Шеф дома</div>
+    <div class="header-sub">Введи ингредиенты — получи рецепты</div>
+  </div>
+
+  <div class="api-section" style="display:none">
+    <div class="api-label">Groq API ключ</div>
+    <div class="api-row">
+      <input type="password" class="api-input" id="apiKey" placeholder="gsk_...">
+      <button class="api-save-btn" onclick="saveKey()">Сохранить</button>
+    </div>
+    <div class="api-status" id="apiStatus"></div>
+  </div>
+
+  <div class="content">
+
+    <div class="section-title">Мои ингредиенты</div>
+    <div class="ingredients-box">
+      <textarea class="ingredients-textarea" id="ingredients"
+        placeholder="Например: яйца, помидоры, сыр, лук, чеснок..."></textarea>
+    </div>
+
+    <div class="tags-row">
+      <div class="tag" onclick="addTag(this, 'яйца')">🥚 яйца</div>
+      <div class="tag" onclick="addTag(this, 'курица')">🍗 курица</div>
+      <div class="tag" onclick="addTag(this, 'картофель')">🥔 картофель</div>
+      <div class="tag" onclick="addTag(this, 'помидоры')">🍅 помидоры</div>
+      <div class="tag" onclick="addTag(this, 'рис')">🍚 рис</div>
+      <div class="tag" onclick="addTag(this, 'макароны')">🍝 макароны</div>
+      <div class="tag" onclick="addTag(this, 'сыр')">🧀 сыр</div>
+      <div class="tag" onclick="addTag(this, 'лук')">🧅 лук</div>
+    </div>
+
+    <div class="section-title">Тип блюда</div>
+    <div class="options-row">
+      <div class="option-chip selected" onclick="selectOption(this)">Любое</div>
+      <div class="option-chip" onclick="selectOption(this)">Завтрак</div>
+      <div class="option-chip" onclick="selectOption(this)">Обед</div>
+      <div class="option-chip" onclick="selectOption(this)">Ужин</div>
+    </div>
+
+    <button class="search-btn" id="searchBtn" onclick="findRecipes()">
+      ✦ Найти рецепты
+    </button>
+
+    <div class="loading" id="loading">
+      <div class="loader"></div>
+      <div class="loading-text">Шеф думает...</div>
+    </div>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <div class="results" id="results">
+      <div class="results-header" id="resultsHeader"></div>
+      <div id="recipesList"></div>
+    </div>
+
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🥗</div>
+      <div class="empty-text">Что есть в холодильнике?</div>
+      <div class="empty-sub">Введи ингредиенты или нажми на подсказки выше</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let savedKey = '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';
+
+  if (savedKey) {
+    document.getElementById('apiKey').value = savedKey;
+    document.getElementById('apiStatus').textContent = '✓ Ключ сохранён';
+  }
+
+  function saveKey() {
+    const key = document.getElementById('apiKey').value.trim();
+    if (!key) return;
+    localStorage.setItem('groq_key', key);
+    savedKey = key;
+    const status = document.getElementById('apiStatus');
+    status.textContent = '✓ Ключ сохранён';
+    status.style.color = '#2a6b4a';
+  }
+
+  function addTag(el, ingredient) {
+    el.classList.toggle('active');
+    const textarea = document.getElementById('ingredients');
+    const current = textarea.value.trim();
+    if (el.classList.contains('active')) {
+      textarea.value = current ? current + ', ' + ingredient : ingredient;
+    } else {
+      const parts = textarea.value.split(',').map(s => s.trim()).filter(s => s !== ingredient);
+      textarea.value = parts.join(', ');
+    }
+  }
+
+  function selectOption(el) {
+    document.querySelectorAll('.option-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function getSelectedMeal() {
+    return document.querySelector('.option-chip.selected')?.textContent || 'Любое';
+  }
+
+  async function findRecipes() {
+    const ingredients = document.getElementById('ingredients').value.trim();
+    const key = document.getElementById('apiKey').value.trim() || savedKey;
+
+    if (!ingredients) { showError('Введите ингредиенты!'); return; }
+    if (!key) { showError('Введите Gemini API ключ выше'); return; }
+
+    setLoading(true);
+    hideError();
+    hideResults();
+
+    const meal = getSelectedMeal();
+    const mealHint = meal !== 'Любое' ? ` (тип: ${meal})` : '';
+
+    const prompt = `Ты опытный шеф-повар. У пользователя есть следующие ингредиенты: ${ingredients}${mealHint}.
+
+Предложи ровно 10 РАЗНЫХ рецептов — от простых до сложных, разных кухонь мира.
+Для каждого рецепта дай подробные шаги (минимум 5-7 шагов с деталями).
+
+Ответь ТОЛЬКО валидным JSON без лишнего текста, без markdown:
+{"recipes":[{
+  "name":"Название блюда",
+  "emoji":"эмодзи",
+  "time":"25 мин",
+  "difficulty":"Легко",
+  "calories":"350 ккал",
+  "servings":"2 порции",
+  "tip":"Совет шефа одним предложением",
+  "ingredients_used":["ингредиент из списка пользователя"],
+  "ingredients_extra":["доп ингредиент если нужен (не обязательный)"],
+  "steps":["Подробный шаг 1","Подробный шаг 2","Подробный шаг 3","Подробный шаг 4","Подробный шаг 5"]
+}]}`;
+
+    try {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${key}`
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          temperature: 0.7,
+          max_tokens: 8000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      const data = await res.json();
+      if (data.error) { showError('Ошибка API: ' + data.error.message); setLoading(false); return; }
+
+      let text = data.choices?.[0]?.message?.content || '';
+      text = text.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(text);
+      renderRecipes(parsed.recipes);
+
+    } catch(e) {
+      showError('Ошибка: ' + e.message);
+    }
+
+    setLoading(false);
+  }
+
+  function renderRecipes(recipes) {
+    const list = document.getElementById('recipesList');
+    const header = document.getElementById('resultsHeader');
+    header.textContent = `Нашёл ${recipes.length} рецептов для тебя`;
+    list.innerHTML = '';
+
+    recipes.forEach((r, i) => {
+      const card = document.createElement('div');
+      card.className = 'recipe-card';
+      card.style.animationDelay = (i * 0.1) + 's';
+
+      const ingHtml = [
+        ...(r.ingredients_used||[]).map(x=>`<span class="ingredient-tag">${x}</span>`),
+        ...(r.ingredients_extra||[]).map(x=>`<span class="ingredient-tag missing">+ ${x}</span>`)
+      ].join('');
+
+      const stepsHtml = (r.steps||[]).map((s,i)=>
+        `<li class="step-item"><div class="step-num">${i+1}</div><div class="step-text">${s}</div></li>`
+      ).join('');
+
+      card.innerHTML = `
+        <div class="recipe-header" onclick="this.parentElement.classList.toggle('open')">
+          <div class="recipe-emoji">${r.emoji||'🍽️'}</div>
+          <div class="recipe-info">
+            <div class="recipe-name">${r.name}</div>
+            <div class="recipe-meta">
+              <span>⏱ ${r.time}</span>
+              <span>📊 ${r.difficulty}</span>
+              <span>🔥 ${r.calories||''}</span>
+              <span>🍽 ${r.servings||''}</span>
+            </div>
+          </div>
+          <div class="expand-icon">⌄</div>
+        </div>
+        <div class="recipe-body">
+          <div class="recipe-divider"></div>
+          <div class="recipe-content">
+            <div class="recipe-section-title">Ингредиенты</div>
+            <div class="ingredients-list">${ingHtml}</div>
+            ${r.tip ? `<div style="background:#fffbf5;border-left:3px solid var(--accent);padding:10px 14px;border-radius:8px;font-size:13px;color:var(--muted);margin-bottom:16px;">💡 ${r.tip}</div>` : ''}
+            <div class="recipe-section-title">Приготовление</div>
+            <ul class="steps-list">${stepsHtml}</ul>
+          </div>
+        </div>`;
+      list.appendChild(card);
+    });
+
+    document.getElementById('results').classList.add('show');
+    document.getElementById('emptyState').style.display = 'none';
+  }
+
+  function setLoading(show) {
+    document.getElementById('loading').classList.toggle('show', show);
+    document.getElementById('searchBtn').disabled = show;
+    if (show) document.getElementById('emptyState').style.display = 'none';
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorBox');
+    el.textContent = '⚠️ ' + msg;
+    el.classList.add('show');
+  }
+
+  function hideError() { document.getElementById('errorBox').classList.remove('show'); }
+  function hideResults() { document.getElementById('results').classList.remove('show'); }
+</script>
+</body>
+</html>
